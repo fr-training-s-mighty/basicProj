@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Test Application</title>
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .quiz-container, .review-container, .result-container {
+            display: none;
+        }
+        .active {
+            display: block;
+        } -->
+    </style>
+</head>
+<body>
+    <h1>Online Test Application</h1>
+
+    <!-- Quiz Module -->
+    <div class="quiz-container active">
+        <h2>Quiz</h2>
+        <button onclick="startQuiz()">Start Quiz</button>
+    </div>
+
+    <!-- Review Module -->
+    <div class="review-container">
+        <h2>Review and Display Result</h2>
+        <button onclick="reviewAnswers()">Review Answers</button>
+    </div>
+
+    <!-- Result Module -->
+    <div class="result-container">
+        <h2>Result</h2>
+        <div id="result"></div>
+    </div>
+
+    <!-- Quiz Questions JSON (simulated data) -->
+    <script id="quiz-data" type="application/json">[{
+                "question": "What is 2 + 2?",
+                "options": ["2", "3", "4", "5"],
+                "correctAnswer": "4"
+            },
+            {
+                "question": "What is the capital of France?",
+                "options": ["Madrid", "Berlin", "Paris", "Rome"],
+                "correctAnswer": "Paris"
+            }]</script>
+
+    <!-- Answers JSON (to simulate user's answers) -->
+    <script id="answers-data" type="application/json">[{
+                "question": "What is 2 + 2?",
+                "answer": "4"
+            },
+            {
+                "question": "What is the capital of France?",
+                "answer": "Paris"
+            }]</script>
+
+    <!-- JavaScript for Quiz Application -->
+    <script>
+        // console.log(document.getElementById('quiz-data').textContent);
+        let currentQuestion = 0;
+        const quizData = JSON.parse(document.getElementById('quiz-data').textContent);
+        const answersData = JSON.parse(document.getElementById('answers-data').textContent);
+
+        function startQuiz() {
+            showQuizQuestion(currentQuestion);
+        }
+
+        function showQuizQuestion(index) {
+            const quizContainer = document.querySelector('.quiz-container');
+            quizContainer.innerHTML = `
+                <h2>Quiz</h2>
+                <p>${quizData[index].question}</p>
+                <ul>
+                    ${quizData[index].options.map(option => `<li>${option}</li>`).join('')}
+                </ul>
+                <button onclick="nextQuestion()">Next Question</button>
+            `;
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < quizData.length) {
+                showQuizQuestion(currentQuestion);
+            } else {
+                showReviewModule();
+            }
+        }
+
+        function showReviewModule() {
+            const quizContainer = document.querySelector('.quiz-container');
+            const reviewContainer = document.querySelector('.review-container');
+            quizContainer.classList.remove('active');
+            reviewContainer.classList.add('active');
+        }
+
+        function reviewAnswers() {
+            const resultContainer = document.querySelector('.result-container');
+            let correctCount = 0;
+            answersData.forEach(answer => {
+                const question = quizData.find(q => q.question === answer.question);
+                if (question && question.correctAnswer === answer.answer) {
+                    correctCount++;
+                }
+            });
+
+            const totalQuestions = quizData.length;
+            const score = (correctCount / totalQuestions) * 100;
+            resultContainer.innerHTML = `
+                <h2>Result</h2>
+                <p>You scored ${score}% (${correctCount} out of ${totalQuestions} correct).</p>
+            `;
+            resultContainer.classList.add('active');
+        }
+    </script>
+</body>
+</html>
